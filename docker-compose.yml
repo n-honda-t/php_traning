@@ -1,0 +1,38 @@
+version: '3'
+services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./infra/nginx/nginx-conf:/etc/nginx/conf.d
+    depends_on:
+      - php
+
+  php:
+    build: ./infra/php
+    volumes:
+      - ./src:/var/www/html
+
+  mysql:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: training
+      MYSQL_USER: developer
+      MYSQL_PASSWORD: developer
+      TZ: Asia/Tokyo  # 東京のタイムゾーンを設定
+    volumes:
+      - ./infra/mysql/data:/var/lib/mysql
+      - ./infra/mysql/conf.d:/etc/mysql/conf.d
+    ports:
+      - "3306:3306"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: developer
+      PMA_PASSWORD: developer
